@@ -30,12 +30,10 @@ const deleteFile = (filePath, err1) => {
   });
 };
 
-const existDirectory = (fileDirectory, cb) => {
+const existDirectory = (fileDirectory) => {
   const arrDir = fs.readdirSync(`${directory}/${fileDirectory}`);
   if(arrDir.length === 0){
-    fs.mkdir(`${directory}/${fileDirectory}`, (err) => {
-      if(err) cb(err);
-    });
+    fs.mkdirSync(`${directory}/${fileDirectory}`);
   }
 }
 
@@ -118,8 +116,8 @@ class CharacterController{
       const phrasesArr = getArrPhrasesPart(bodyKeys, bodyValues, 'phrase');
       const audiosArr = getArrPhrasesPart(filesKeys, filesValues, 'audio');
 
-      existDirectory(`img/${animeDirectory}`, err => res.send(err));
-      existDirectory(`audio/${animeDirectory}`, err => res.send(err));
+      existDirectory(`img/${animeDirectory}`);
+      existDirectory(`audio/${animeDirectory}`);
 
       img.mv(imgPath, (err) => {
         if(err) deleteFile(imgPath, err);
