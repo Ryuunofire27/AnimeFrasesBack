@@ -1,10 +1,16 @@
 const schema = require('../schemas/personaje-schema');
-const ftpClient = require('../ftp/ftpClient');
+const PhrasesModel = require('../models/phrases-model');
+
+const pm = new PhrasesModel();
+let s = new schema();
 
 class CharacterModel{
 
-  getAll(cb){
-    schema.find({}, (err, docs) => {
+  getAll(limit = 10, page = 1, cb){
+    schema.find({})
+    .select('_id name description anime sex')
+    .limit(limit * (page - 1))
+    .exec((err, docs) => {
       if(err) throw err;
       cb(docs);
     });
@@ -17,11 +23,22 @@ class CharacterModel{
     });
   }
 
+  getSearch(limit = 5, page = 1, cb){
+    schema.find(search)
+    .select('_id name description')
+    .limit(limit * (page - 1))
+    .exec((err, docs) => {
+      if(err) throw err;
+      cb(docs);
+    });
+  }
+
   getPhrasesByCharacter(id, cb){
     schema.findById(id,'phrases', (err, docs) => {
       if (err) throw err;
       cb(docs); 
     });
+    
   }
 
   getPhraseById(idCharacter, idPhrase, cb){
@@ -31,7 +48,7 @@ class CharacterModel{
         console.log(val);
         if(val._id == idPhrase) return val;
       });
-      cb(docs); 
+      cb(docs.phrases); 
     });
   }
 
@@ -45,51 +62,23 @@ class CharacterModel{
     });
   }
 
-  saveCharacter(data, cb){
-    schema.count({_id: data._id}, (err, count) => {
-      if (err) throw err;
-      const imgRelUrl = ftpClient.putFile('img', data.img);
-      const phrases = [];
-      data.phrases.map((phrase) => {
-        const audio = ftpClient.putFile('audio', phrase.audio);
-        phrases.push({
-          phrase: phrases.phrase,
-          audio : audio
-        });
-      });
-      const popularColor = 'black';
-      const contrastColor = 'white';
-      const character = {
-        _id : data._id,
-        clicks: data.cllicks,
-        name : data.name,
-        description : [
-          data.anime,
-          data.sex
-        ],
-        popularColor,
-        contrastColor,
-        imgRelUrl,
-        phrases
-      };
+  saveCharacter(data, cb, cbErr){
+    schema.count({name: data.name}, (err, count) => {
+      if (err) cbErr('El personaje ya existe');
       if (count === 0) {
-        schema.create(character, (err) => {
-          if (err) throw err;
-          cb();
-        });
-      } else if (count === 1) {
-        schema.findByIdAndUpdate(data.id, character, (err) => {
-          if (err) throw err;
-          cb();
-        });
+        schema.create(data)
+          .then( docs => cb('Insert/Update succesful'))
+          .catch( err =>  cbErr('Error, insert unsuccesful'));
+      }else{
+        cbErr('Error, the name character exist');
       }
     });
   }
 
   delete(id,cb){
 		schema.findByIdAndRemove(id, (err) => {
-			if(err) throw err;
-			cb();
+			if(err) cb('Error, delete unsuccesful');
+      cb('Delete succesful');
 		});
   }
   
@@ -100,8 +89,8 @@ class CharacterModel{
         if(val._id != idPhrase) return val
       });
       schema.findByIdAndUpdate(id, docs, (err) => {
-        if(err) throw err;
-        cb();
+        if(err) cb('Error, delete unsuccesful');
+        cb('Delete phrase succesful');
       });
     });
   }

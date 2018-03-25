@@ -4,10 +4,12 @@ const Schema = mongoose.Schema;
 
 //way 1
 const CharacterSchema = new Schema({
-  _id : Schema.Types.ObjectId,
+  _id : Schema.Types.ObjectId ,
   name : String,
   clicks: Number,
-  description: Array,
+  description: String,
+  sex: String,
+  anime: String,
   popularColor : String,
   contrastColor: String,
   imgRelUrl : String,

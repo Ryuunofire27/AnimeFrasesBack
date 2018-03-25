@@ -8,6 +8,7 @@ router
   .get('/:id', cc.getById)
   .get('/:id/phrases', cc.getPhrasesByCharacter)
   .get('/:idCharacter/phrases/:idPhrase', cc.getPhraseById)
+  .get('/')
   .post('/', cc.save)
   .put('/:id', cc.save)
   .delete('/:id', cc.delete)
