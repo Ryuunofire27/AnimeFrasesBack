@@ -31,11 +31,12 @@ const deleteFile = (filePath, err1) => {
 };
 
 const existDirectory = (fileDirectory, cb) => {
-  fs.readdir(`${directory}/${fileDirectory}`, (err) => {
-    if(err) fs.mkdir(`${directory}/${fileDirectory}`, (err) => {
+  const arrDir = fs.readdirSync(`${directory}/${fileDirectory}`);
+  if(arrDir.length === 0){
+    fs.mkdir(`${directory}/${fileDirectory}`, (err) => {
       if(err) cb(err);
     });
-  });
+  }
 }
 
 class CharacterController{
