@@ -9,7 +9,8 @@ class CharacterModel{
   getAll(limit = 10, page = 1, cb){
     schema.find({})
     .select('_id name description anime sex')
-    .limit(limit * (page - 1))
+    .skip(limit * (page - 1))
+    .limit(limit)
     .exec((err, docs) => {
       if(err) throw err;
       cb(docs);
@@ -72,6 +73,13 @@ class CharacterModel{
       }else{
         cbErr('Error, the name character exist');
       }
+    });
+  }
+
+  updateCharacter(data, cb){
+    schema.findByIdAndUpdate(data._id, data, (err) => {
+      if(err) cb('Error, update character unsuccesful')
+      cb('Update character succesful');
     });
   }
 

@@ -41,6 +41,19 @@ const existDirectory = (fileDirectory, cb) => {
   });
 }
 
+const addPhrases = (phrases, phrasesArr, audiosArr, animeDirectory) => {
+  for(let i = 0; i < phrasesArr.length; i++){
+    const audioPath = `${directory}/audio/${animeDirectory}/${audiosArr[i].name}`
+    audiosArr[i].mv(audioPath, (err) => {
+      if(err) deleteFile(audioPath, err);
+    });
+    phrases.push({
+      phrase: phrasesArr[i],
+      audioRelUrl: audioPath.split(directory+'/')[1]
+    });
+  }
+}
+
 class CharacterController{
 
 	getAll(req,res,next){
@@ -126,16 +139,7 @@ class CharacterController{
           if(err) deleteFile(imgPath, err);
           if(phrasesArr.length === audiosArr.length){
             const phrases = [];
-            for(let i = 0; i < phrasesArr.length; i++){
-              const audioPath = `${directory}/audio/${animeDirectory}/${audiosArr[i].name}`
-              audiosArr[i].mv(audioPath, (err) => {
-                if(err) deleteFile(audioPath, err);
-              });
-              phrases.push({
-                phrase: phrasesArr[i],
-                audioRelUrl: audioPath.split(directory+'/')[1]
-              });
-            }
+            addPhrases(phrases, phrasesArr, audiosArr, animeDirectory);
             ce.getColors(imgPath, (color) => {
               const character = {
                 _id: null,
@@ -165,7 +169,26 @@ class CharacterController{
     }else{
       res.send({message: "Error, falta llenar campos"});
     }
-	}
+  }
+  
+  addPhrases(req, res, next){
+    const _id = req.params.id;
+    if(_id){
+      const bodyKeys = Object.keys(req.body);
+      const bodyValues = Object.values(req.body);
+      const filesKeys = Object.keys(req.files);
+      const filesValues = Object.values(req.files);
+      const phrasesArr = getArrPhrasesPart(bodyKeys, bodyValues, 'phrase');
+      const audiosArr = getArrPhrasesPart(filesKeys, filesValues, 'audio');
+      cm.getById(_id, (docs) => {
+        const animeDirectory = docs.anime.toUpperCase().replace(/ /g, '-');
+        addPhrases(docs.phrases, phrasesArr, audiosArr, animeDirectory);
+        cm.updateCharacter(docs, msg => res.send(msg));
+      });
+    }else{
+     res.send('Error, falta el id'); 
+    }
+  }
 
 	delete(req,res,next){
 		const id = req.params.id;

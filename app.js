@@ -1,5 +1,5 @@
 const express = require('express');
-const cRoute = require('./routes/character-route');
+const routes = require('./routes/routes');
 const bodyParser = require('body-parser');
 const restFul = require('express-method-override')('_method');
 const fileUpload = require('express-fileupload');
@@ -15,6 +15,6 @@ app
   .use(bodyParser.urlencoded({ extended: false }))
   .use(restFul)
   .use(fileUpload())
-  .use('/characters', cRoute);
+  .use(routes);
 
 module.exports = app;
