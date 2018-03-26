@@ -10,7 +10,6 @@ const port = 3000;
 
 app
   .set('port', port)
-  
   .use(bodyParser.json())
   .use(bodyParser.urlencoded({ extended: false }))
   .use(restFul)

@@ -6,6 +6,11 @@ const directory = '/var/animefrases';
 const ce = new ColorExtract();
 const cm = new CharacterModel();
 
+const format = (name) => {
+  const date = new Date();
+  return `${date.getTime()}_${name}`;
+};
+
 const getArrPhrasesPart = (keys, values, part) => {
   if(!keys || !values || !part) throw new Error('Send all parameters');
   let j = 0;
@@ -43,7 +48,7 @@ const existDirectory = (fileDirectory, cb) => {
 
 const addPhrases = (phrases, phrasesArr, audiosArr, animeDirectory) => {
   for(let i = 0; i < phrasesArr.length; i++){
-    const audioPath = `${directory}/audio/${animeDirectory}/${audiosArr[i].name}`
+    const audioPath = `${directory}/audio/${animeDirectory}/${format(audiosArr[i].name)}`
     audiosArr[i].mv(audioPath, (err) => {
       if(err) deleteFile(audioPath, err);
     });
@@ -125,7 +130,7 @@ class CharacterController{
     if(name && anime && sex && files){
       const animeDirectory = anime.toUpperCase().replace(/ /g, '-');
       const img = files.img;
-      const imgPath = `${directory}/img/${animeDirectory}/${img.name}`;
+      const imgPath = `${directory}/img/${animeDirectory}/${format(img.name)}`;
       const bodyKeys = Object.keys(req.body);
       const bodyValues = Object.values(req.body);
       const filesKeys = Object.keys(req.files);
@@ -170,7 +175,7 @@ class CharacterController{
       res.send({message: "Error, falta llenar campos"});
     }
   }
-  
+
   addPhrases(req, res, next){
     const _id = req.params.id;
     if(_id){
