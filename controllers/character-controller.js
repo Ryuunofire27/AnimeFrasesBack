@@ -30,11 +30,15 @@ const deleteFile = (filePath, err1) => {
   });
 };
 
-const existDirectory = (fileDirectory) => {
-  const arrDir = fs.readdirSync(`${directory}/${fileDirectory}`);
-  if(arrDir.length === 0){
-    fs.mkdirSync(`${directory}/${fileDirectory}`);
-  }
+const existDirectory = (fileDirectory, cb) => {
+  fs.readdir(`${directory}/${fileDirectory}`, (err) => {
+    if(err) {
+      fs.mkdirSync(`${directory}/${fileDirectory}`);
+    }
+    if(cb){
+      cb();
+    }
+  });
 }
 
 class CharacterController{
@@ -116,50 +120,47 @@ class CharacterController{
       const phrasesArr = getArrPhrasesPart(bodyKeys, bodyValues, 'phrase');
       const audiosArr = getArrPhrasesPart(filesKeys, filesValues, 'audio');
 
-      existDirectory(`img/${animeDirectory}`);
       existDirectory(`audio/${animeDirectory}`);
-
-      img.mv(imgPath, (err) => {
-        if(err) deleteFile(imgPath, err);
-        if(phrasesArr.length === audiosArr.length){
-          const phrases = [];
-          for(let i = 0; i < phrasesArr.length; i++){
-            const audioPath = `${directory}/audio/${animeDirectory}/${audiosArr[i].name}`
-            audiosArr[i].mv(audioPath, (err) => {
-              if(err) deleteFile(audioPath, err);
-            });
-            phrases.push({
-              phrase: phrasesArr[i],
-              audioRelUrl: audioPath.split(directory+'/')[1]
-            });
-          }
-          ce.getColors(imgPath, (color) => {
-            const character = {
-              _id: null,
-              clicks: (req.body.clicks || 0),
-              name : req.body.name.toUpperCase(),
-              anime: anime.toUpperCase(),
-              sex: sex.toUpperCase(),
-              imgRelUrl : imgPath.split(directory+'/')[1],
-              popularColor : color.normal,
-              contrastColor : color.contrast,
-              phrases : phrases
-            };
-            console.log(character);
-            cm.saveCharacter(character, (msg) => res.send({message: msg}), (msg) => {
-                deleteFile(`${directory}/${character.imgRelUrl}`);
-                character.phrases.map((phrase) => {
-                  console.log(`${directory}/${phrase.audioRelUrl}`);
-                  deleteFile(`${directory}/${phrase.audioRelUrl}`);
-                });
-                res.send({message: msg})
+      existDirectory(`img/${animeDirectory}`, () => {
+        img.mv(imgPath, (err) => {
+          if(err) deleteFile(imgPath, err);
+          if(phrasesArr.length === audiosArr.length){
+            const phrases = [];
+            for(let i = 0; i < phrasesArr.length; i++){
+              const audioPath = `${directory}/audio/${animeDirectory}/${audiosArr[i].name}`
+              audiosArr[i].mv(audioPath, (err) => {
+                if(err) deleteFile(audioPath, err);
               });
-            });
-        }else{
-          deleteFile(imgPath, err);
-          res.status(500);
-          res.send({message : 'No hay la misma cantidad de audios que de frases'});
-        }
+              phrases.push({
+                phrase: phrasesArr[i],
+                audioRelUrl: audioPath.split(directory+'/')[1]
+              });
+            }
+            ce.getColors(imgPath, (color) => {
+              const character = {
+                _id: null,
+                clicks: (req.body.clicks || 0),
+                name : req.body.name.toUpperCase(),
+                anime: anime.toUpperCase(),
+                sex: sex.toUpperCase(),
+                imgRelUrl : imgPath.split(directory+'/')[1],
+                popularColor : color.normal,
+                contrastColor : color.contrast,
+                phrases : phrases
+              };
+              cm.saveCharacter(character, (msg) => res.send({message: msg}), (msg) => {
+                  deleteFile(`${directory}/${character.imgRelUrl}`);
+                  character.phrases.map((phrase) => {
+                    deleteFile(`${directory}/${phrase.audioRelUrl}`);
+                  });
+                  res.send({message: msg})
+                });
+              });
+          }else{
+            deleteFile(imgPath, err);
+            res.send({message : 'No hay la misma cantidad de audios que de frases'});
+          }
+        });
       });
     }else{
       res.send({message: "Error, falta llenar campos"});

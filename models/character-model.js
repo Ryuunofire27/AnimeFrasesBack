@@ -64,7 +64,7 @@ class CharacterModel{
 
   saveCharacter(data, cb, cbErr){
     schema.count({name: data.name}, (err, count) => {
-      if (err) cbErr('El personaje ya existe');
+      if (err) cbErr(err);
       if (count === 0) {
         schema.create(data)
           .then( docs => cb('Insert/Update succesful'))
