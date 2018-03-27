@@ -1,11 +1,11 @@
 const router = require('express').Router();
-const character_route = require('./character-route');
-const user_route = require('./user-route');
-const files_route = require('./files-routes');
+const characterRoute = require('./character-route');
+const userRoute = require('./user-route');
+const filesRoute = require('./files-routes');
 
 router
-  .use('/characters', character_route)
-  .use('/users', user_route)
-  .use('/files', files_route);
+  .use('/characters', characterRoute)
+  .use('/users', userRoute)
+  .use('/files', filesRoute);
 
 module.exports = router;

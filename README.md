@@ -4,7 +4,8 @@
 
 ### GET METHODS
 ```
-  get all                           =>      characters?limit=number&page=number
+  get all                           =>      characters/
+  (query: search, sex, anime, limit, page)
   get by id                         =>      characters/idCharacter
   get phrases by character          =>      characters/idCharacter/phrases
   get phrase by character and by id =>      characters/idCharacter/phrases/idPhrase
@@ -20,6 +21,7 @@
 
 ```
   save character                    =>      characters/
+  (body: name, anime, sex, img, audio_0, phrase_0, ...)
   save user                         =>      user/
   (body: user, pssw)
   login                             =>      user/login
@@ -29,14 +31,16 @@
 ### PUT METHODS
 
 ```
-  update character                  =>      characters/
+  update character                  =>      characters/idCharacter
+  (body: name, anime, sex, img?)
   update phrases                    =>      characters/idCharacter/phrases
+  (body: phrase_0, audio_0, ...)
 ```
 
 ### DELETE METHODS
 
 ```
   delete character                  =>      characters/
-  delete phrase by character        =>      characters/idCharacter/phrases
+  delete phrase by character        =>      characters/idCharacter/phrases/idPhrase
   delete user                       =>      users/idUser
 ```

@@ -1,11 +1,11 @@
 {
   "name": "anime-frases",
-  "version": "1.2.0",
+  "version": "1.3.1",
   "description": "backend de la web sobre frases de animes",
   "main": "index.js",
   "scripts": {
     "start": "supervisor server.js",
-    "eslint": "eslint ./**.js"
+    "eslint": "eslint ./**/*.js"
   },
   "author": "Charlie",
   "license": "MIT",

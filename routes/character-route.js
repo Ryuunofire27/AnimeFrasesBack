@@ -10,7 +10,7 @@ router
   .get('/:idCharacter/phrases/:idPhrase', cc.getPhraseById)
   .get('/')
   .post('/', cc.save)
-  .put('/:id', cc.save)
+  .put('/:id', cc.update)
   .put('/:id/phrases', cc.addPhrases)
   .delete('/:id', cc.delete)
   .delete('/:id/phrases/:idPhrase', cc.deletePhrase);

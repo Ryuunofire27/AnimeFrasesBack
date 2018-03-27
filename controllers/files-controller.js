@@ -10,8 +10,14 @@ class FilesController{
 
     if(type && anime && file){
       const path = `${directory}/${type}/${anime}/${file}`;
-      const readable = fs.createReadStream(path);
-      readable.pipe(res);
+      fs.exists(path, (exists) => {
+        if(exists){
+          const readable = fs.createReadStream(path); 
+          readable.pipe(res)
+        }else{ 
+          res.status(500).send({msg : 'File not found'});
+        }
+      })
     }else{
       res.status(500).send({msg : 'File not found'});
     }
