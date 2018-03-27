@@ -11,6 +11,9 @@
 
   get users                         =>      users
   get user by id                    =>      users/idUser
+
+  get file                          =>      files/type/anime/file
+  (type/anime/file = imgUrl or audio Url)
 ```
 
 ### POST METHODS
