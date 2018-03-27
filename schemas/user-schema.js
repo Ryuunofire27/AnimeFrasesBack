@@ -1,6 +1,6 @@
 const mongoose = require('../database/db');
 
-const Schema = { Schema: mongoose.Schema };
+const Schema = mongoose.Schema;
 
 const UserSchema = new Schema(
   {
