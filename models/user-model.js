@@ -40,7 +40,7 @@ class UserModel {
     schema.findOne(user, '_id user', (err, doc) => {
       if (err) cb('Internal error');
       if (doc) {
-        cb('Permision granted');
+        cb('', doc);
       } else {
         cb('Usuario y contraseña no coinciden');
       }

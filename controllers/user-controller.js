@@ -69,7 +69,13 @@ class CharacterController{
         user,
         password : hmac.digest('hex')
       }
-      um.login(usuario, msg => res.send({msg}));
+      um.login(usuario, (msg, doc) => {
+        if(doc){
+          res.send(doc);
+        }else{
+          res.send({ msg })
+        }
+      });
     }
   }
 }
