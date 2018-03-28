@@ -36,6 +36,7 @@ function createCard(id, imgUrl){
     if (audiosUrl.length !== 0){
       var random = Math.floor(Math.random() * audiosUrl.length);
       source.attributes.src.nodeValue = urlBase + '/files/' + audiosUrl[random];
+      audio.load()
       audio.play();
     } else {
       request('GET', '/characters/' + id, function(res){
@@ -44,6 +45,7 @@ function createCard(id, imgUrl){
         }
         var random = Math.floor(Math.random() * audiosUrl.length);
         source.attributes.src.nodeValue = urlBase + '/files/' + audiosUrl[random];
+        audio.load();
         audio.play();
       });
     }
