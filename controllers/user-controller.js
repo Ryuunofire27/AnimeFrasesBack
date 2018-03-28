@@ -1,83 +1,72 @@
 const UserModel = require('../models/user-model');
+const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
+const seed = require('../config/token').seed;
 
 const um = new UserModel();
 
-class CharacterController{
-
-	getAll(req,res,next){
-    um.getAll( docs => res.send(docs));
+class UserController {
+  getAll(req, res) {
+    um.getAll(docs => res.send(docs));
   }
 
-	getById(req,res,next){
+  getById(req, res) {
     const id = req.params.id;
-    cm.getById(id, (docs) => {
-      docs ? res.send(docs) : res.send({message: 'Don\'t exist document'});
+    um.getById(id, (docs) => {
+      docs ? res.send(docs) : res.send({ message: 'Don\'t exist document' });
     });
   }
 
-	save(req,res,next){
+	save(req, res) {
     const user = req.body.user;
     const pssw = req.body.pssw;
-    if(user && pssw){
+    if (user && pssw) {
       const hmac = crypto.createHmac('sha256', 'afErChCoWa');
       hmac.update(pssw);
       const usuario = {
-        _id : null,
+        _id: null,
         user,
-        password : hmac.digest('hex')
-      }
-      um.save(usuario, msg => res.send({msg}));
-    }else{
-      res.status(500).send({ msg: 'falta llenar campos' })
+        password: hmac.digest('hex'),
+      };
+      um.save(usuario, msg => res.send({ msg }));
+    } else {
+      res.status(400).send({ msg: 'falta llenar campos' });
     }
   }
-  
-  update(req, res, next){
-    /*const user = req.body.user;
-    const pssw = req.body.pssw;
-    const _id = req.body.id;
-    if(user || pssw){
-      hmac.update(pssw);
-      const usuario = {
-        _id,
-        user,
-        password : hmac.digest('hex')
-      }
-      um.save(usuario, msg => res.send({msg}));
-    }*/
+
+	delete(req, res) {
+		const id = req.params.id;
+		um.delete(id, msg => res.send({ message: msg }));
   }
 
-	delete(req,res,next){
-		const id = req.params.id;
-		cm.delete(id, (msg) => res.send({message: msg}));
-  }
-  
-  deletePhrase(req, res, next){
+  deletePhrase(req, res) {
     const id = req.params.id;
     const idPhrase = req.params.idPhrase;
-    cm.deletePhrase(id, idPhrase, (msg) => res.send({message: msg}));
+    um.deletePhrase(id, idPhrase, msg => res.send({ message: msg }));
   }
 
-  login(req, res, next){
+  login(req, res) {
     const user = req.body.user;
     const pssw = req.body.pssw;
-    if(user || pssw){
+    if (user && pssw) {
       const hmac = crypto.createHmac('sha256', 'afErChCoWa');
       hmac.update(pssw);
       const usuario = {
         user,
-        password : hmac.digest('hex')
-      }
+        password: hmac.digest('hex'),
+      };
       um.login(usuario, (msg, doc) => {
-        if(doc){
-          res.send(doc);
-        }else{
-          res.send({ msg })
+        if (doc) {
+          const token = jwt.sign({ user: doc }, seed, { expiresIn: 3600 });
+          res.send({ user: doc, token });
+        } else {
+          res.send({ msg });
         }
       });
+    } else {
+      res.status(400).send({ msg: 'Falta llenar campos' });
     }
   }
 }
 
-module.exports = CharacterController;
+module.exports = UserController;

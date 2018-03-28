@@ -39,7 +39,7 @@ class CharacterModel {
             cb({ count, docs });
           });
       } else {
-        cb({ msg: 'Not found' })
+        cb({ msg: 'Not found' });
       }
     });
   }
@@ -47,7 +47,7 @@ class CharacterModel {
   getPhrasesByCharacter(id, cb) {
     schema.findById(id, 'phrases', (err, docs) => {
       if (err) throw err;
-      cb(docs); 
+      cb(docs);
     });
   }
 
@@ -55,9 +55,9 @@ class CharacterModel {
     schema.findOne({ _id: idCharacter }, 'phrases', (err, docs) => {
       if (err) throw err;
       docs.phrases = docs.phrases.filter((val) => {
-        if (val._id == idPhrase) return val;
+        if (val._id === parseInt(idPhrase, 10)) return val;
       });
-      cb(docs.phrases); 
+      cb(docs.phrases);
     });
   }
 
@@ -65,8 +65,8 @@ class CharacterModel {
     schema.findById(id, (err, docs) => {
       if (err) throw err;
       docs.clicks = docs.clicks + 1;
-      schema.findByIdAndUpdate(id, docs, (err) => {
-        if (err) throw err;
+      schema.findByIdAndUpdate(id, docs, (err1) => {
+        if (err1) throw err;
       });
     });
   }
@@ -76,8 +76,8 @@ class CharacterModel {
       if (err) cbErr(err);
       if (count === 0) {
         schema.create(data)
-          .then( docs => cb('Insert/Update succesful'))
-          .catch( err =>  {cbErr('Error, insert unsuccesful')});
+          .then(docs => cb('Insert/Update succesful', docs))
+          .catch(err1 => cbErr('Error, insert unsuccesful', err1));
       } else {
         cbErr('Error, the name character exist');
       }
@@ -86,7 +86,7 @@ class CharacterModel {
 
   updateCharacter(data, cb) {
     schema.findByIdAndUpdate(data._id, data, (err) => {
-      if (err) cb('Error, update character unsuccesful')
+      if (err) cb('Error, update character unsuccesful');
       cb('Update character succesful');
     });
   }
@@ -97,24 +97,23 @@ class CharacterModel {
       schema.findByIdAndRemove(id, (err1) => {
         if (err1) throw err1;
         cb(doc, 'Delete succesful');
-      }); 
+      });
     });
   }
-  
+
   deletePhrase(id, idPhrase, cb) {
     schema.findById(id, (err, docs) => {
       if (err) throw err;
       let audioPath = null;
       docs.phrases = docs.phrases.filter((val) => {
-        if (val._id != idPhrase) {
+        if (val._id !== parseInt(idPhrase, 10)) {
           return val;
-        } else {
-          audioPath = val.audioRelUrl;
         }
+        audioPath = val.audioRelUrl;      
       });
       schema.findByIdAndUpdate(id, docs, (err1) => {
         if (err1) cb('Error, delete unsuccesful');
-        cb(audioPath,'Delete phrase succesful');
+        cb(audioPath, 'Delete phrase succesful');
       });
     });
   }

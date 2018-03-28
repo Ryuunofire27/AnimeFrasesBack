@@ -1,15 +1,12 @@
 var urlBase = 'http://107.170.225.213:3000';
 var body = document.body;
+var playingAudio = null;
 
 function request(type, url, cb){
-  var xhttp = new XMLHttpRequest();
-  xhttp.onreadystatechange = function () {
-    if(this.readyState == 4 && this.status == 200){
-      cb(JSON.parse(this.responseText));
-    }
-  }
-  xhttp.open(type, urlBase + url, true);
-  xhttp.send();
+  fetch(urlBase + url, {method: type, cache: 'default'})
+    .then(res => res.json())
+    .then( data => cb(data))
+    .catch(err => console.log(err));
 }
 
 function createCard(id, imgUrl){
@@ -32,12 +29,15 @@ function createCard(id, imgUrl){
   card.appendChild(audio);
 
   card.addEventListener('click', function(){
-    console.log(audiosUrl);
+    if(playingAudio){
+      playingAudio.pause();
+    }
     if (audiosUrl.length !== 0){
       var random = Math.floor(Math.random() * audiosUrl.length);
       source.attributes.src.nodeValue = urlBase + '/files/' + audiosUrl[random];
       audio.load()
       audio.play();
+      playingAudio = audio;
     } else {
       request('GET', '/characters/' + id, function(res){
         for(var i = 0; i < res.phrases.length; i++){
@@ -47,6 +47,7 @@ function createCard(id, imgUrl){
         source.attributes.src.nodeValue = urlBase + '/files/' + audiosUrl[random];
         audio.load();
         audio.play();
+        playingAudio = audio;
       });
     }
   });
@@ -55,11 +56,12 @@ function createCard(id, imgUrl){
 }
 
 (function(){
-  request('GET', '/characters', function(res) {
-    var characters = res.docs;
-    for(var i = 0; i < characters.length; i++){
-      createCard(characters[i]._id, characters[i].imgRelUrl);
-    }
-  });
+  fetch(urlBase + '/characters', {method: 'GET'})
+    .then( res => res.json())
+    .then( data => {
+      var characters = data.docs;
+      for(var i = 0; i < characters.length; i++){
+        createCard(characters[i]._id, characters[i].imgRelUrl);
+      }
+    });
 })()
-
