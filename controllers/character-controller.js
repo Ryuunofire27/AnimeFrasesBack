@@ -89,7 +89,7 @@ class CharacterController {
     cm.getById(id, (docs) => {
       docs ? res.send(docs) : res.send({ message: 'Don\'t exist document' });
     });
-    cm.addingClick(idCharacter);
+    cm.addingClick(id);
   }
   
   getPhrasesByCharacter(req, res) {

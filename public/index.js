@@ -4,7 +4,10 @@ var playingAudio = null;
 
 function request(type, url, cb){
   fetch(urlBase + url, {method: type, cache: 'default'})
-    .then(res => res.json())
+    .then(res => {
+      console.log(res);
+      res.json()
+    })
     .then(data => cb(data))
     .catch(err => console.log(err));
 }
