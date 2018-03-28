@@ -5,7 +5,7 @@ var playingAudio = null;
 function request(type, url, cb){
   fetch(urlBase + url, {method: type, cache: 'default'})
     .then(res => res.json())
-    .then( data => cb(data))
+    .then(data => cb(data))
     .catch(err => console.log(err));
 }
 
@@ -40,6 +40,7 @@ function createCard(id, imgUrl){
       playingAudio = audio;
     } else {
       request('GET', '/characters/' + id, function(res){
+        console.log(res);
         for(var i = 0; i < res.phrases.length; i++){
           audiosUrl.push(res.phrases[i].audioRelUrl);
         }
