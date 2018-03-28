@@ -1,6 +1,9 @@
 const mongoose = require('../database/db');
+const autoIncrement = require('mongoose-auto-increment');
 
 const Schema = mongoose.Schema;
+
+autoIncrement.initialize(mongoose.connection);
 
 const CharacterSchema = new Schema(
   {
@@ -24,6 +27,8 @@ const CharacterSchema = new Schema(
     versionKey: false,
   },
 );
+
+CharacterSchema.plugin(autoIncrement.plugin, { model: 'Character', field: 'id'})
 
 const Character = mongoose.model('Character', CharacterSchema);
 

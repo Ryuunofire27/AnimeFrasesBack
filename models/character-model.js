@@ -6,7 +6,7 @@ class CharacterModel {
       if (err) throw err;
       if (count > 0) {
         schema.find({})
-          .select('_id name description anime sex')
+          .select('_id id name description anime sex')
           .skip(limit * (page - 1))
           .limit(limit)
           .exec((err1, docs) => {
@@ -31,7 +31,7 @@ class CharacterModel {
       if (err) throw err;
       if (count > 0) {
         schema.find(search)
-          .select('_id name description anime sex')
+          .select('_id id name description anime sex')
           .skip(limit * (page - 1))
           .limit(limit)
           .exec((err1, docs) => {

@@ -15,10 +15,11 @@ class CharacterController{
       docs ? res.send(docs) : res.send({message: 'Don\'t exist document'});
     });
   }
+
 	save(req,res,next){
     const user = req.body.user;
     const pssw = req.body.pssw;
-    if(user || pssw){
+    if(user && pssw){
       const hmac = crypto.createHmac('sha256', 'afErChCoWa');
       hmac.update(pssw);
       const usuario = {
@@ -27,6 +28,8 @@ class CharacterController{
         password : hmac.digest('hex')
       }
       um.save(usuario, msg => res.send({msg}));
+    }else{
+      res.status(500).send({ msg: 'falta llenar campos' })
     }
   }
   

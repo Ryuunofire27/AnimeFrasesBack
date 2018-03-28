@@ -22,9 +22,9 @@
 ```
   save character                    =>      characters/
   (body: name, anime, sex, img, audio_0, phrase_0, ...)
-  save user                         =>      user/
+  save user                         =>      users/
   (body: user, pssw)
-  login                             =>      user/login
+  login                             =>      users/login
   (body: user, pssw)
 ```
 
