@@ -125,7 +125,8 @@ class CharacterController{
     if(name && anime && sex && files){
       const animeDirectory = anime.toUpperCase().replace(/ /g, '-');
       const img = files.img;
-      const imgPath = `${directory}/img/${animeDirectory}/${format(img.name)}`;
+      img.name = format(img.name);
+      const imgPath = `${directory}/img/${animeDirectory}/${img.name}`;
       const bodyKeys = Object.keys(req.body);
       const bodyValues = Object.values(req.body);
       const filesKeys = Object.keys(req.files);

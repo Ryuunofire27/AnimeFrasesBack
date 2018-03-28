@@ -28,7 +28,7 @@ const CharacterSchema = new Schema(
   },
 );
 
-CharacterSchema.plugin(autoIncrement.plugin, { model: 'Character', field: 'id'})
+CharacterSchema.plugin(autoIncrement.plugin, { model: 'Character', field: 'id'});
 
 const Character = mongoose.model('Character', CharacterSchema);
 

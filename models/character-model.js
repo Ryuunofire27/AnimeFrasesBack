@@ -77,7 +77,7 @@ class CharacterModel {
       if (count === 0) {
         schema.create(data)
           .then( docs => cb('Insert/Update succesful'))
-          .catch( err =>  cbErr('Error, insert unsuccesful'));
+          .catch( err =>  {cbErr('Error, insert unsuccesful')});
       } else {
         cbErr('Error, the name character exist');
       }

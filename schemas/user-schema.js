@@ -1,5 +1,4 @@
 const mongoose = require('../database/db');
-const CounterCharacter = require('./counter-schema');
 
 const Schema = mongoose.Schema;
 
