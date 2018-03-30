@@ -1,17 +1,21 @@
 const schema = require('../schemas/personaje-schema');
 
 class CharacterModel {
-  getAll(cb, limit = 10, page = 1) {
+  getAll(cb, limit, page) {
+    const limite = limit ? limit : 10;
+    const pagina = page ? page : 1;
+    const skip = limite * (pagina - 1);
     schema.count({}, (err, count) => {
       if (err) throw err;
       if (count > 0) {
         schema.find({})
           .select('_id id name description anime sex imgRelUrl')
-          .skip(limit * (page - 1))
-          .limit(limit)
+          .skip(skip)
+          .limit(limite)
           .exec((err1, docs) => {
             if (err1) throw err1;
-            cb({ count, docs, pages : parseInt(count / limit, 10) });
+            const pages = Math.ceil(count / limite);
+            cb({ count, docs, pages });
           });
       } else {
         cb({ msg: 'Not found' });
@@ -26,7 +30,10 @@ class CharacterModel {
     });
   }
 
-  getSearch(search, cb, limit = 5, page = 1) {
+  getSearch(search, cb, limit, page) {
+    const limite = limit ? limit : 5;
+    const pagina = page ? page : 1;
+    const skip = limite * (pagina - 1);
     schema.count(search, (err, count) => {
       if (err) throw err;
       if (count > 0) {
@@ -36,7 +43,8 @@ class CharacterModel {
           .limit(limit)
           .exec((err1, docs) => {
             if (err1) throw err1;
-            cb({ count, docs, pages: parseInt(count / limit, 10) });
+            const pages = Math.ceil(count / limite);
+            cb({ count, docs, pages});
           });
       } else {
         cb({ msg: 'Not found' });
