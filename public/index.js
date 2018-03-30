@@ -1,13 +1,10 @@
-var urlBase = 'http://107.170.225.213:3000';
+var urlBase = 'http://localhost:3000';
 var body = document.body;
 var playingAudio = null;
 
 function request(type, url, cb){
   fetch(urlBase + url, {method: type, cache: 'default'})
-    .then(res => {
-      console.log(res);
-      res.json()
-    })
+    .then(res => res.json())
     .then(data => cb(data))
     .catch(err => console.log(err));
 }
@@ -17,6 +14,8 @@ function createCard(id, imgUrl){
   var img = document.createElement('img');
   var audio = document.createElement('audio');
   var source = document.createElement('source');
+
+  var random = null;
 
   audio.setAttribute('controls', '');
   source.setAttribute('src', '');
@@ -36,7 +35,7 @@ function createCard(id, imgUrl){
       playingAudio.pause();
     }
     if (audiosUrl.length !== 0){
-      var random = Math.floor(Math.random() * audiosUrl.length);
+      random = Math.floor(Math.random() * audiosUrl.length);
       source.attributes.src.nodeValue = urlBase + '/files/' + audiosUrl[random];
       audio.load()
       audio.play();
@@ -47,7 +46,7 @@ function createCard(id, imgUrl){
         for(var i = 0; i < res.phrases.length; i++){
           audiosUrl.push(res.phrases[i].audioRelUrl);
         }
-        var random = Math.floor(Math.random() * audiosUrl.length);
+        random = Math.floor(Math.random() * audiosUrl.length);
         source.attributes.src.nodeValue = urlBase + '/files/' + audiosUrl[random];
         audio.load();
         audio.play();

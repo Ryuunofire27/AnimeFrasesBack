@@ -54,10 +54,10 @@ class CharacterModel {
   getPhraseById(idCharacter, idPhrase, cb) {
     schema.findOne({ _id: idCharacter }, 'phrases', (err, docs) => {
       if (err) throw err;
-      docs.phrases = docs.phrases.filter((val) => {
-        if (val._id === parseInt(idPhrase, 10)) return val;
+      const phrase = docs.phrases.filter((val) => {
+        if (val._id == idPhrase) return val;
       });
-      cb(docs.phrases);
+      cb(phrase);
     });
   }
 
@@ -106,7 +106,7 @@ class CharacterModel {
       if (err) throw err;
       let audioPath = null;
       docs.phrases = docs.phrases.filter((val) => {
-        if (val._id !== parseInt(idPhrase, 10)) {
+        if (val._id != idPhrase) {
           return val;
         }
         audioPath = val.audioRelUrl;      

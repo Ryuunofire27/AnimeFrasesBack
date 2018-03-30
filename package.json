@@ -1,6 +1,6 @@
 {
   "name": "anime-frases",
-  "version": "1.5.4",
+  "version": "1.5.5",
   "description": "backend de la web sobre frases de animes",
   "main": "index.js",
   "scripts": {

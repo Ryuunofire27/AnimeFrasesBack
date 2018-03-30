@@ -1,62 +1,11 @@
 const CharacterModel = require('../models/character-model');
 const fs = require('fs');
 const ColorExtract = require('../util/extract-color');
+const util = require('../util/util');
 
 const directory = '/var/animefrases';
 const ce = new ColorExtract();
 const cm = new CharacterModel();
-
-const format = (name) => {
-  const date = new Date();
-  return `${date.getTime()}_${name}`;
-};
-
-const getArrPhrasesPart = (keys, values, part) => {
-  if (!keys || !values || !part) throw new Error('Send all parameters');
-  let j = 0;
-  const arr = [];
-  for (let i = 0; i < keys.length; i++) {
-    if (keys[i] === `${part}_${j}`) {
-      arr.push(values[i]);
-      j++;
-    }
-  }
-  return arr;
-};
-
-const deleteFile = (filePath, err1) => {
-  fs.stat(filePath, (err) => {
-    if (!err) {
-      fs.unlink(filePath, (err) => {
-        if (!err) console.log('eliminado con exito');
-      });
-    }
-  });
-};
-
-const existDirectory = (fileDirectory, cb) => {
-  fs.readdir(`${directory}/${fileDirectory}`, (err) => {
-    if (err) {
-      fs.mkdirSync(`${directory}/${fileDirectory}`);
-    }
-    if (cb) {
-      cb();
-    }
-  });
-}
-
-const addPhrases = (phrases, phrasesArr, audiosArr, animeDirectory) => {
-  for (let i = 0; i < phrasesArr.length; i++) {
-    const audioPath = `${directory}/audio/${animeDirectory}/${format(audiosArr[i].name)}`
-    audiosArr[i].mv(audioPath, (err) => {
-      if(err) deleteFile(audioPath, err);
-    });
-    phrases.push({
-      phrase: phrasesArr[i],
-      audioRelUrl: audioPath.split(directory+'/')[1]
-    });
-  }
-}
 
 class CharacterController {
 
@@ -77,7 +26,6 @@ class CharacterController {
       if (sex) {
         objectSearch.sex = sex.toUpperCase();
       }
-      console.log(objectSearch);
       cm.getSearch(objectSearch, docs => res.send(docs));
     } else {
       cm.getAll( docs => res.send(docs), parseInt(limit), parseInt(page));
@@ -125,25 +73,25 @@ class CharacterController {
     if (name && anime && sex && files) {
       const animeDirectory = anime.toUpperCase().replace(/ /g, '-');
       const img = files.img;
-      img.name = format(img.name);
+      img.name = util.format(img.name);
       const imgPath = `${directory}/img/${animeDirectory}/${img.name}`;
       const bodyKeys = Object.keys(req.body);
       const bodyValues = Object.values(req.body);
       const filesKeys = Object.keys(req.files);
       const filesValues = Object.values(req.files);
-      const phrasesArr = getArrPhrasesPart(bodyKeys, bodyValues, 'phrase');
-      const audiosArr = getArrPhrasesPart(filesKeys, filesValues, 'audio');
+      const phrasesArr = util.getArrPhrasesPart(bodyKeys, bodyValues, 'phrase');
+      const audiosArr = util.getArrPhrasesPart(filesKeys, filesValues, 'audio');
 
       existDirectory(`audio/${animeDirectory}`);
       existDirectory(`img/${animeDirectory}`, () => {
         img.mv(imgPath, (err) => {
           if (err) {
-            deleteFile(imgPath, err);
+            util.deleteFile(imgPath, err);
             res.status(500).send({ msg: 'Error al guardar imagen' });
           }
           if (phrasesArr.length === audiosArr.length) {
             const phrases = [];
-            addPhrases(phrases, phrasesArr, audiosArr, animeDirectory);
+            util.addPhrases(phrases, phrasesArr, audiosArr, animeDirectory);
             ce.getColors(imgPath, (color) => {
               const character = {
                 _id: null,
@@ -157,15 +105,15 @@ class CharacterController {
                 phrases: phrases,
               };
               cm.saveCharacter(character, (msg) => res.send({ msg }), (msg) => {
-                  deleteFile(`${directory}/${character.imgRelUrl}`);
+                  util.deleteFile(`${directory}/${character.imgRelUrl}`);
                   character.phrases.map((phrase) => {
-                    deleteFile(`${directory}/${phrase.audioRelUrl}`);
+                    util.deleteFile(`${directory}/${phrase.audioRelUrl}`);
                   });
                   res.send({ msg})
                 });
               });
           } else {
-            deleteFile(imgPath, err);
+            util.deleteFile(imgPath, err);
             res.status(400).send({ message : 'No hay la misma cantidad de audios que de frases' });
           }
         });
@@ -190,12 +138,12 @@ class CharacterController {
       if (files) {
         const img = files.img;
         const animeDirectory = anime.toUpperCase().replace(/ /g, '-'); 
-        const imgPath = `${directory}/img/${animeDirectory}/${format(img.name)}`;
+        const imgPath = `${directory}/img/${animeDirectory}/${util.format(img.name)}`;
         
         existDirectory(`img/${animeDirectory}`, () => {
           img.mv(imgPath, (err) => {
             if (err) {
-              deleteFile(imgPath);
+              util.deleteFile(imgPath);
               res.status(500).send({ msg: 'Error al guardar imagen' });
             }
             ce.getColors(imgPath, (color) => {
@@ -205,7 +153,7 @@ class CharacterController {
               cm.getById(_id, (doc) => {
                 character.clicks = doc.clicks;
                 character.phrases = doc.phrases;
-                deleteFile(`${directory}/${doc.imgRelUrl}`);
+                util.deleteFile(`${directory}/${doc.imgRelUrl}`);
                 cm.updateCharacter(character, msg => res.send({ msg }));
               });
             });
@@ -234,12 +182,12 @@ class CharacterController {
       const bodyValues = Object.values(req.body);
       const filesKeys = Object.keys(req.files);
       const filesValues = Object.values(req.files);
-      const phrasesArr = getArrPhrasesPart(bodyKeys, bodyValues, 'phrase');
-      const audiosArr = getArrPhrasesPart(filesKeys, filesValues, 'audio');
+      const phrasesArr = util.getArrPhrasesPart(bodyKeys, bodyValues, 'phrase');
+      const audiosArr = util.getArrPhrasesPart(filesKeys, filesValues, 'audio');
       cm.getById(_id, (docs) => {
         if (docs) {
           const animeDirectory = docs.anime.toUpperCase().replace(/ /g, '-');
-          addPhrases(docs.phrases, phrasesArr, audiosArr, animeDirectory);
+          util.addPhrases(docs.phrases, phrasesArr, audiosArr, animeDirectory);
           cm.updateCharacter(docs, msg => res.send({ msg }));
         } else {
           res.status(204).send({ msg: 'Character not found' });
@@ -250,22 +198,70 @@ class CharacterController {
     }
   }
 
+  updatePhrase(req, res){
+    const idCharacter = req.params.idCharacter;
+    const idPhrase = req.params.idPhrase;
+    if (idCharacter && idPhrase) {
+      const phrase = req.body.phrase;
+      const files = req.files;
+      if (files){
+        const audio= req.files.audio;
+        const audioArr = [audio];
+        const phrasesArr = [phrase];
+        const phrasesAdd = [];
+        const phraseObj = {};
+        util.addPhrases(phrasesAdd, phrasesArr, audioArr);
+        phraseObj.phrase = phrasesAdd[0].phrase;
+        phraseObj.audioRelUrl = phrasesAdd[0].audioRelUrl;
+        cm.getById(idCharacter, (doc) => {
+          doc.phrases = doc.phrases.map((phrase) => {
+            if(phrase._id === parseInt(idPhrase, 10)){
+              phrase.phrase = phraseObj.phrase;
+              phrase.audioRelUrl = phraseObj.audioRelUrl;
+              return phrase;
+            }
+            return phrase;
+          });
+          cm.updateCharacter(doc, msg => res.send({ msg }));
+        });
+      } else {
+        const phraseObj = { phrase };
+        cm.getById(idCharacter, (doc) => {
+          doc.phrases = doc.phrases.map((phrase) => {
+            if(phrase._id === parseInt(idPhrase, 10)){
+              phrase.phrase = phraseObj.phrase;
+              return phrase;
+            }
+            return phrase;
+          });
+          cm.updateCharacter(doc, msg => res.send({ msg }));
+        });
+      }
+    } else {
+      res.status(400).send({ msg: 'Error, falta los ids'});
+    }
+  }
+
 	delete(req, res) {
-		const id = req.params.id;
-		cm.delete(id, (doc, msg) => {
-      deleteFile(`${directory}/${doc.imgRelUrl}`);
-      doc.phrases.map((phrase) => {
-        deleteFile(`${directory}/${phrase.audioRelUrl}`);
+    const id = req.params.id;
+    if (id) {
+      cm.delete(id, (doc, msg) => {
+        util.deleteFile(`${directory}/${doc.imgRelUrl}`);
+        doc.phrases.map((phrase) => {
+          util.deleteFile(`${directory}/${phrase.audioRelUrl}`);
+        });
+        res.send({ message: msg })
       });
-      res.send({ message: msg })
-    });
+    } else {
+      res.status(400).send({ msg: 'Error, falta el id'});
+    }
   }
   
   deletePhrase(req, res) {
     const id = req.params.id;
     const idPhrase = req.params.idPhrase;
     cm.deletePhrase(id, idPhrase, (audioPath, msg) => {
-      deleteFile(`${directory}/${audioPath}`);
+      util.deleteFile(`${directory}/${audioPath}`);
       res.send({ message: msg })
     });
   }
