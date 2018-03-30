@@ -11,7 +11,7 @@ class CharacterModel {
           .limit(limit)
           .exec((err1, docs) => {
             if (err1) throw err1;
-            cb({ count, docs });
+            cb({ count, docs, pages : parseInt(count / limit, 10) });
           });
       } else {
         cb({ msg: 'Not found' });
@@ -36,7 +36,7 @@ class CharacterModel {
           .limit(limit)
           .exec((err1, docs) => {
             if (err1) throw err1;
-            cb({ count, docs });
+            cb({ count, docs, pages: parseInt(count / limit, 10) });
           });
       } else {
         cb({ msg: 'Not found' });
