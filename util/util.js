@@ -5,6 +5,7 @@ const directory = '/var/animefrases';
 class Util {
   static format(name) {
     const date = new Date();
+    console.log(`${date.getTime()}_${name}`);
     return `${date.getTime()}_${name}`;
   }
   
@@ -44,7 +45,8 @@ class Util {
   
   static addPhrases(phrases, phrasesArr, audiosArr, animeDirectory) {
     for (let i = 0; i < phrasesArr.length; i++) {
-      const audioPath = `${directory}/audio/${animeDirectory}/${this.format(audiosArr[i].name)}`
+      const name = this.format(audiosArr[i].name);
+      const audioPath = `${directory}/audio/${animeDirectory}/${name}`;
       audiosArr[i].mv(audioPath, (err) => {
         if(err) {
           this.deleteFile(audioPath);

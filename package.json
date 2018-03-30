@@ -1,6 +1,6 @@
 {
   "name": "anime-frases",
-  "version": "1.5.11",
+  "version": "1.5.12",
   "description": "backend de la web sobre frases de animes",
   "main": "index.js",
   "scripts": {
@@ -15,6 +15,9 @@
     "express": "^4.16.3",
     "express-fileupload": "^0.4.0",
     "express-method-override": "0.0.3",
+    "imagemin": "^5.3.1",
+    "imagemin-jpegtran": "^5.0.2",
+    "imagemin-pngquant": "^5.1.0",
     "jsonwebtoken": "^8.2.0",
     "mongoose": "^5.0.11",
     "mongoose-auto-increment": "^5.0.1",

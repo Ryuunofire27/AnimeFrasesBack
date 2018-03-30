@@ -1,15 +1,18 @@
 const schema = require('../schemas/personaje-schema');
 
 class CharacterModel {
-  getAll(cb, limit, page) {
+  getAll(cb, limit, page, pop) {
     const limite = limit ? limit : 10;
     const pagina = page ? page : 1;
     const skip = limite * (pagina - 1);
+    const order = pop ? { clicks : pop } : undefined;
+    
     schema.count({}, (err, count) => {
       if (err) throw err;
       if (count > 0) {
         schema.find({})
-          .select('_id id name description anime sex imgRelUrl')
+          .select('_id id name description anime sex imgRelUrl clicks')
+          .sort(order)
           .skip(skip)
           .limit(limite)
           .exec((err1, docs) => {
@@ -30,17 +33,19 @@ class CharacterModel {
     });
   }
 
-  getSearch(search, cb, limit, page) {
+  getSearch(search, cb, limit, page, pop) {
     const limite = limit ? limit : 5;
     const pagina = page ? page : 1;
     const skip = limite * (pagina - 1);
+    const order = pop ? { clicks : pop } : undefined;
+
     schema.count(search, (err, count) => {
       if (err) throw err;
       if (count > 0) {
         schema.find(search)
-          .select('_id id name description anime sex imgRelUrl')
+          .select('_id id name description anime sex imgRelUrl click')
           .skip(limit * (page - 1))
-          .limit(limit)
+          .limit(limite)
           .exec((err1, docs) => {
             if (err1) throw err1;
             const pages = Math.ceil(count / limite);
