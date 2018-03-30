@@ -31,7 +31,7 @@ class CharacterModel {
       if (err) throw err;
       if (count > 0) {
         schema.find(search)
-          .select('_id id name description anime sex')
+          .select('_id id name description anime sex imgRelUrl')
           .skip(limit * (page - 1))
           .limit(limit)
           .exec((err1, docs) => {
@@ -45,14 +45,14 @@ class CharacterModel {
   }
 
   getPhrasesByCharacter(id, cb) {
-    schema.findById(id, 'phrases', (err, docs) => {
+    schema.findById(id, '_id phrases imgRelUrl', (err, docs) => {
       if (err) throw err;
       cb(docs);
     });
   }
 
   getPhraseById(idCharacter, idPhrase, cb) {
-    schema.findOne({ _id: idCharacter }, 'phrases', (err, docs) => {
+    schema.findOne({ _id: idCharacter }, '_id phrases imgRelUrl', (err, docs) => {
       if (err) throw err;
       const phrase = docs.phrases.filter((val) => {
         if (val._id == idPhrase) return val;
