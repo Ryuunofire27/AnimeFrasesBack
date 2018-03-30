@@ -82,8 +82,8 @@ class CharacterController {
       const phrasesArr = util.getArrPhrasesPart(bodyKeys, bodyValues, 'phrase');
       const audiosArr = util.getArrPhrasesPart(filesKeys, filesValues, 'audio');
 
-      existDirectory(`audio/${animeDirectory}`);
-      existDirectory(`img/${animeDirectory}`, () => {
+      util.existDirectory(`audio/${animeDirectory}`);
+      util.existDirectory(`img/${animeDirectory}`, () => {
         img.mv(imgPath, (err) => {
           if (err) {
             util.deleteFile(imgPath, err);
@@ -109,7 +109,7 @@ class CharacterController {
                   character.phrases.map((phrase) => {
                     util.deleteFile(`${directory}/${phrase.audioRelUrl}`);
                   });
-                  res.send({ msg})
+                  res.send({ msg })
                 });
               });
           } else {
@@ -140,7 +140,7 @@ class CharacterController {
         const animeDirectory = anime.toUpperCase().replace(/ /g, '-'); 
         const imgPath = `${directory}/img/${animeDirectory}/${util.format(img.name)}`;
         
-        existDirectory(`img/${animeDirectory}`, () => {
+        util.existDirectory(`img/${animeDirectory}`, () => {
           img.mv(imgPath, (err) => {
             if (err) {
               util.deleteFile(imgPath);
@@ -204,33 +204,34 @@ class CharacterController {
     if (idCharacter && idPhrase) {
       const phrase = req.body.phrase;
       const files = req.files;
+      const anime = req.body.anime;
+      const animeDirectory = anime.toUpperCase().replace(/ /g, '-');
+      const phraseObj = {};
       if (files){
         const audio= req.files.audio;
         const audioArr = [audio];
         const phrasesArr = [phrase];
         const phrasesAdd = [];
-        const phraseObj = {};
-        util.addPhrases(phrasesAdd, phrasesArr, audioArr);
+        util.addPhrases(phrasesAdd, phrasesArr, audioArr, animeDirectory);
         phraseObj.phrase = phrasesAdd[0].phrase;
         phraseObj.audioRelUrl = phrasesAdd[0].audioRelUrl;
         cm.getById(idCharacter, (doc) => {
           doc.phrases = doc.phrases.map((phrase) => {
             if (phrase._id == idPhrase) {
+              util.deleteFile(`${directory}/${phrase.audioRelUrl}`);
               phrase.phrase = phraseObj.phrase;
               phrase.audioRelUrl = phraseObj.audioRelUrl;
-              return phrase;
             }
             return phrase;
           });
           cm.updateCharacter(doc, msg => res.send({ msg }));
         });
       } else {
-        const phraseObj = { phrase };
+        phraseObj.phrase = phrase;
         cm.getById(idCharacter, (doc) => {
           doc.phrases = doc.phrases.map((phrase) => {
-            if(phrase._id === parseInt(idPhrase, 10)){
+            if(phrase._id == idPhrase){
               phrase.phrase = phraseObj.phrase;
-              return phrase;
             }
             return phrase;
           });
@@ -250,18 +251,20 @@ class CharacterController {
         doc.phrases.map((phrase) => {
           util.deleteFile(`${directory}/${phrase.audioRelUrl}`);
         });
-        res.send({ message: msg })
+        res.send({ msg });
       });
     } else {
-      res.status(400).send({ msg: 'Error, falta el id'});
+      res.status(400).send({ msg: 'Error, falta el id' });
     }
   }
   
   deletePhrase(req, res) {
     const id = req.params.id;
     const idPhrase = req.params.idPhrase;
-    cm.deletePhrase(id, idPhrase, (audioPath, msg) => {
-      util.deleteFile(`${directory}/${audioPath}`);
+    cm.deletePhrase(id, idPhrase, (msg, audioPath) => {
+      if(audioPath){
+        util.deleteFile(`${directory}/${audioPath}`);
+      }
       res.send({ message: msg })
     });
   }

@@ -1,4 +1,4 @@
-var urlBase = 'http://localhost:3000';
+var urlBase = 'http://107.170.225.213:3000';
 var body = document.body;
 var playingAudio = null;
 

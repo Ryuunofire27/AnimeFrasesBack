@@ -111,9 +111,10 @@ class CharacterModel {
         }
         audioPath = val.audioRelUrl;      
       });
+      console.log(docs.phrases);
       schema.findByIdAndUpdate(id, docs, (err1) => {
         if (err1) cb('Error, delete unsuccesful');
-        cb(audioPath, 'Delete phrase succesful');
+        cb('Delete phrase succesful', audioPath);
       });
     });
   }
