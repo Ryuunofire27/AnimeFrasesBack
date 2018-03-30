@@ -1,6 +1,6 @@
 {
   "name": "anime-frases",
-  "version": "1.5.5",
+  "version": "1.5.6",
   "description": "backend de la web sobre frases de animes",
   "main": "index.js",
   "scripts": {
@@ -11,6 +11,7 @@
   "license": "MIT",
   "dependencies": {
     "body-parser": "^1.18.2",
+    "cors": "^2.8.4",
     "express": "^4.16.3",
     "express-fileupload": "^0.4.0",
     "express-method-override": "0.0.3",

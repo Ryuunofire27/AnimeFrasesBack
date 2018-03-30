@@ -215,7 +215,7 @@ class CharacterController {
         phraseObj.audioRelUrl = phrasesAdd[0].audioRelUrl;
         cm.getById(idCharacter, (doc) => {
           doc.phrases = doc.phrases.map((phrase) => {
-            if(phrase._id === parseInt(idPhrase, 10)){
+            if (phrase._id == idPhrase) {
               phrase.phrase = phraseObj.phrase;
               phrase.audioRelUrl = phraseObj.audioRelUrl;
               return phrase;

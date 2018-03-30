@@ -1,5 +1,12 @@
-exports.cors = (req, res, next) => {
-  res.header('Access-Control-Allow-Origin', '*');
-  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
-  next();
-};
+const cors = require('cors');
+
+const corsOptions = {
+  origin: '*',
+  optionsSuccessStatus: 204,
+  allowedHeaders: 'Content-Type, Authorization, Accept, Accept-Language, Content-Language',
+  preflightContinue: false,
+  methos: 'GET, HEAD, PUT, POST, DELETE',
+
+}
+
+module.exports = cors;
