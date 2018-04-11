@@ -1,26 +1,27 @@
 const CharacterModel = require('../models/character-model');
-const fs = require('fs');
 const ColorExtract = require('../util/extract-color');
 const util = require('../util/util');
+const directory = require('../config/directory').directory;
 
-const directory = '/var/animefrases';
 const ce = new ColorExtract();
 const cm = new CharacterModel();
 
 class CharacterController {
-
-	getAll(req, res) {
+  getAll(req, res) {
     const search = req.query.search;
     const sex = req.query.sex;
     const anime = req.query.anime;
     const limit = req.query.limit;
     const page = req.query.page;
     const pop = req.query.pop;
-
+    const notVoid = req.query.void;
+    let wh = null;
     if(pop){
-      if(!(pop === 'asc' || pop === 'desc')) return res.status(400).send({ msg: 'pop is not a defined statement'})
+      if(!(pop === 'asc' || pop === 'desc')) return res.status(400).send({ message: 'pop is not a defined statement'})
     }
-
+    if(notVoid == 1){
+      wh = {phrases: {$gt: []}};
+    }
     if(search || anime || sex){
       const objectSearch = {};
       if (search) {
@@ -32,16 +33,16 @@ class CharacterController {
       if (sex) {
         objectSearch.sex = sex.toUpperCase();
       }
-      cm.getSearch(objectSearch, docs => res.send(docs), parseInt(limit), parseInt(page), pop);
+      cm.getSearch(objectSearch, docs => res.send(docs), parseInt(limit), parseInt(page), pop, wh);
     } else {
-      cm.getAll( docs => res.send(docs), parseInt(limit), parseInt(page), pop);
+      cm.getAll( docs => res.send(docs), parseInt(limit), parseInt(page), pop, wh);
     }
   }
 
 	getById(req, res) {
     const id = req.params.id;
     cm.getById(id, (docs) => {
-      docs ? res.send(docs) : res.send({ message: 'Don\'t exist document' });
+      docs ? res.send(docs) : res.status(404).send({ message: 'Don\'t exist document' });
     });
     cm.addingClick(id);
   }
@@ -49,7 +50,7 @@ class CharacterController {
   getPhrasesByCharacter(req, res) {
     const id = req.params.id;
     cm.getPhrasesByCharacter(id, (docs) => {
-      docs ? res.send(docs) : res.send({ message: 'Don\'t exist document' });
+      docs ? res.send(docs) : res.status(404).send({ message: 'Don\'t exist document' });
     });
   }
 
@@ -57,7 +58,7 @@ class CharacterController {
     const idCharacter = req.params.idCharacter;
     const idPhrase = req.params.idPhrase;
     cm.getPhraseById(idCharacter, idPhrase, (docs) => {
-      docs ? res.send(docs) : res.send({ message: 'Don\'t exist document' });
+      docs ? res.send(docs) : res.status(404).send({ message: 'Don\'t exist document' });
     });
     cm.addingClick(idCharacter);
   }
@@ -66,7 +67,7 @@ class CharacterController {
     const idCharacter = req.params.idCharacter;
     const idPhrase = req.params.idPhrase;
     cm.getPhraseById(idCharacter, idPhrase, (audio) => {
-      audio ? res.write(audio) : res.send({ message: 'Don\'t exist document' });
+      audio ? res.write(audio) : res.status(404).send({ message: 'Don\'t exist document' });
     }); 
     cm.addingClick(idCharacter);
   }
@@ -235,43 +236,6 @@ class CharacterController {
       } else {
         res.status(400).send({ msg: 'falta llenar campos'});
       }
-      /*
-      const phrase = req.body.phrase;
-      const files = req.files;
-      const anime = req.body.anime;
-      const animeDirectory = anime.toUpperCase().replace(/ /g, '-');
-      const phraseObj = {};
-      if (files){
-        const audio= req.files.audio;
-        const audioArr = [audio];
-        const phrasesArr = [phrase];
-        const phrasesAdd = [];
-        util.addPhrases(phrasesAdd, phrasesArr, audioArr, animeDirectory);
-        phraseObj.phrase = phrasesAdd[0].phrase;
-        phraseObj.audioRelUrl = phrasesAdd[0].audioRelUrl;
-        cm.getById(idCharacter, (doc) => {
-          doc.phrases = doc.phrases.map((phrase) => {
-            if (phrase._id == idPhrase) {
-              util.deleteFile(`${directory}/${phrase.audioRelUrl}`);
-              phrase.phrase = phraseObj.phrase;
-              phrase.audioRelUrl = phraseObj.audioRelUrl;
-            }
-            return phrase;
-          });
-          cm.updateCharacter(doc, msg => res.send({ msg }));
-        });
-      } else {
-        phraseObj.phrase = phrase;
-        cm.getById(idCharacter, (doc) => {
-          doc.phrases = doc.phrases.map((phrase) => {
-            if(phrase._id == idPhrase){
-              phrase.phrase = phraseObj.phrase;
-            }
-            return phrase;
-          });
-          cm.updateCharacter(doc, msg => res.send({ msg }));
-        });
-      }*/
     } else {
       res.status(400).send({ msg: 'Error, falta los ids'});
     }
@@ -295,10 +259,26 @@ class CharacterController {
   deletePhrase(req, res) {
     const id = req.params.id;
     const idPhrase = req.params.idPhrase;
-    cm.deletePhrase(id, idPhrase, (msg, audioPath) => {
-      if (audioPath) util.deleteFile(`${directory}/${audioPath}`);
-      res.send({ message: msg })
-    });
+    if(id && idPhrase) {
+      cm.deletePhrase(id, idPhrase, (msg, audioPath) => {
+        if (audioPath) util.deleteFile(`${directory}/${audioPath}`);
+        res.send({ message: msg })
+      });
+    } else {
+      res.status(400).send({ msg: 'Error, falta los ids' });
+    }
+  }
+
+  addingClick(req, res){
+    const id = req.params.id;
+    if (id) {
+      cm.addingClick(id, (err) => {
+        if (err) return res.send(500).send(err);
+        return res.send(200).send({ message: 'Click aumentado correctamente'});
+      });
+    } else {
+      return res.send(400).send({ message: 'Error, falta el id de la frase' });
+    }
   }
 }
 

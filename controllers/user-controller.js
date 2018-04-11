@@ -2,6 +2,7 @@ const UserModel = require('../models/user-model');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 const seed = require('../config/token').seed;
+const key = 'afErChCoWa';
 
 const um = new UserModel();
 
@@ -21,7 +22,7 @@ class UserController {
     const user = req.body.user;
     const pssw = req.body.pssw;
     if (user && pssw) {
-      const hmac = crypto.createHmac('sha256', 'afErChCoWa');
+      const hmac = crypto.createHmac('sha256', key);
       hmac.update(pssw);
       const usuario = {
         _id: null,
@@ -35,21 +36,21 @@ class UserController {
   }
 
 	delete(req, res) {
-		const id = req.params.id;
-		um.delete(id, msg => res.send({ message: msg }));
+    const id = req.params.id;
+		id ? um.delete(id, msg => res.send({ message: msg })) : res.status(400).send({ msg: 'Falta el id' });
   }
 
   deletePhrase(req, res) {
     const id = req.params.id;
     const idPhrase = req.params.idPhrase;
-    um.deletePhrase(id, idPhrase, msg => res.send({ message: msg }));
+    id && idPhrase ? um.deletePhrase(id, idPhrase, msg => res.send({ message: msg })) : res.status(400).send({ msg: 'Falta llenar campos' });
   }
 
   login(req, res) {
     const user = req.body.user;
     const pssw = req.body.pssw;
     if (user && pssw) {
-      const hmac = crypto.createHmac('sha256', 'afErChCoWa');
+      const hmac = crypto.createHmac('sha256', key);
       hmac.update(pssw);
       const usuario = {
         user,

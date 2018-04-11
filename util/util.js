@@ -1,6 +1,5 @@
 const fs = require('fs');
-
-const directory = '/var/animefrases';
+const directory = require('../config/directory').directory;
 
 class Util {
   static format(name) {

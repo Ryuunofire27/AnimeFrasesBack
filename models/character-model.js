@@ -1,17 +1,18 @@
 const schema = require('../schemas/personaje-schema');
 
 class CharacterModel {
-  getAll(cb, limit, page, pop) {
+  getAll(cb, limit, page, pop, wh) {
     const limite = limit ? limit : 10;
     const pagina = page ? page : 1;
     const skip = limite * (pagina - 1);
     const order = pop ? { clicks : pop } : undefined;
-    
+    const whe = wh ? wh : '';
     schema.count({}, (err, count) => {
       if (err) throw err;
       if (count > 0) {
-        schema.find({})
-          .select('_id id name description anime sex imgRelUrl clicks')
+        schema.find()
+          //.select('_id id name description anime sex imgRelUrl clicks')
+          .where(whe)
           .sort(order)
           .skip(skip)
           .limit(limite)
@@ -33,17 +34,17 @@ class CharacterModel {
     });
   }
 
-  getSearch(search, cb, limit, page, pop) {
+  getSearch(search, cb, limit, page, pop, wh) {
     const limite = limit ? limit : 5;
     const pagina = page ? page : 1;
     const skip = limite * (pagina - 1);
     const order = pop ? { clicks : pop } : undefined;
-
+    const whe = wh ? wh : '';
     schema.count(search, (err, count) => {
       if (err) throw err;
       if (count > 0) {
         schema.find(search)
-          .select('_id id name description anime sex imgRelUrl click')
+          //.select('_id id name description anime sex imgRelUrl clicks')
           .skip(limit * (page - 1))
           .limit(limite)
           .exec((err1, docs) => {
@@ -74,12 +75,13 @@ class CharacterModel {
     });
   }
 
-  addingClick(id) {
+  addingClick(id, cb) {
     schema.findById(id, (err, docs) => {
-      if (err) throw err;
+      if (err) cb(err);
       docs.clicks = docs.clicks + 1;
       schema.findByIdAndUpdate(id, docs, (err1) => {
-        if (err1) throw err;
+        if (err1) cb(err1);
+        cb();
       });
     });
   }

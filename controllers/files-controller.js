@@ -1,9 +1,8 @@
 const fs = require('fs');
-
-const directory = '/var/animefrases';
+const directory = require('../config/directory').directory;;
 
 class FilesController{
-  getFile(req, res, next){
+  getFile(req, res){
     const type = req.params.type;
     const anime = req.params.anime;
     const file = req.params.file;
@@ -11,15 +10,15 @@ class FilesController{
     if(type && anime && file){
       const path = `${directory}/${type}/${anime}/${file}`;
       fs.exists(path, (exists) => {
-        if(exists){
+        if (exists) {
           const readable = fs.createReadStream(path); 
           readable.pipe(res)
-        }else{ 
-          res.status(500).send({msg : 'File not found'});
+        } else { 
+          res.status(500).send({ msg: 'File not found' });
         }
-      })
-    }else{
-      res.status(500).send({msg : 'File not found'});
+      });
+    } else {
+      res.status(500).send({ msg: 'File not found' });
     }
   }
 }

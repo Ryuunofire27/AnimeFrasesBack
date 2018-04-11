@@ -10,9 +10,10 @@ router
   .get('/:id/phrases', cc.getPhrasesByCharacter)
   .get('/:idCharacter/phrases/:idPhrase', cc.getPhraseById)
   .post('/', authentication, cc.save)
+  .post('/:id/phrases', authentication, cc.addPhrases)
   .put('/:id', authentication, cc.update)
-  .put('/:id/phrases', authentication, cc.addPhrases)
   .put('/:idCharacter/phrases/:idPhrase', authentication, cc.updatePhrase)
+  .put('/:idCharacter/click')
   .delete('/:id', authentication, cc.delete)
   .delete('/:id/phrases/:idPhrase', authentication, cc.deletePhrase);
 

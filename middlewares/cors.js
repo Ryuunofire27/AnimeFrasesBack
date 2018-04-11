@@ -5,7 +5,7 @@ const corsOptions = {
   optionsSuccessStatus: 204,
   allowedHeaders: 'Content-Type, Authorization, Accept, Accept-Language, Content-Language',
   preflightContinue: false,
-  methos: 'GET, HEAD, PUT, POST, DELETE',
+  method: 'GET, HEAD, PUT, POST, DELETE',
 
 }
 
