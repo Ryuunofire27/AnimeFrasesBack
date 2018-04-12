@@ -46,7 +46,7 @@ class CharacterController {
     });
     cm.addingClick(id, (err) => {
       if (err) return res.send(500).send(err);
-      return res.send(200).send({ message: 'Click aumentado correctamente'});
+      return res.status(200).send({ message: 'Click aumentado correctamente'});
     });
   }
   
@@ -65,7 +65,7 @@ class CharacterController {
     });
     cm.addingClick(idCharacter, (err) => {
       if (err) return res.send(500).send(err);
-      return res.send(200).send({ message: 'Click aumentado correctamente'});
+      return res.status(200).send({ message: 'Click aumentado correctamente'});
     });
   }
 
@@ -77,7 +77,7 @@ class CharacterController {
     }); 
     cm.addingClick(idCharacter, (err) => {
       if (err) return res.send(500).send(err);
-      return res.send(200).send({ message: 'Click aumentado correctamente'});
+      return res.status(200).send({ message: 'Click aumentado correctamente'});
     });
   }
 
@@ -286,10 +286,10 @@ class CharacterController {
     if (id) {
       cm.addingClick(id, (err) => {
         if (err) return res.send(500).send(err);
-        return res.send(200).send({ message: 'Click aumentado correctamente'});
+        return res.status(200).send({ message: 'Click aumentado correctamente'});
       });
     } else {
-      return res.send(400).send({ message: 'Error, falta el id de la frase' });
+      return res.status(400).send({ message: 'Error, falta el id de la frase' });
     }
   }
 }
