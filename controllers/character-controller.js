@@ -45,7 +45,7 @@ class CharacterController {
       docs ? res.status(200).send(docs) : res.status(404).send({ message: 'Don\'t exist document' });
     });
     cm.addingClick(id, (err) => {
-      if (err) return res.send(500).send(err);
+      if (err) return res.status(500).send(err);
       return res.status(200).send({ message: 'Click aumentado correctamente'});
     });
   }
@@ -64,7 +64,7 @@ class CharacterController {
       docs ? res.send(docs) : res.status(404).send({ message: 'Don\'t exist document' });
     });
     cm.addingClick(idCharacter, (err) => {
-      if (err) return res.send(500).send(err);
+      if (err) return res.status(500).send(err);
       return res.status(200).send({ message: 'Click aumentado correctamente'});
     });
   }
@@ -76,7 +76,7 @@ class CharacterController {
       audio ? res.write(audio) : res.status(404).send({ message: 'Don\'t exist document' });
     }); 
     cm.addingClick(idCharacter, (err) => {
-      if (err) return res.send(500).send(err);
+      if (err) return res.status(500).send(err);
       return res.status(200).send({ message: 'Click aumentado correctamente'});
     });
   }
@@ -285,7 +285,7 @@ class CharacterController {
     const id = req.params.id;
     if (id) {
       cm.addingClick(id, (err) => {
-        if (err) return res.send(500).send(err);
+        if (err) return res.status(500).send(err);
         return res.status(200).send({ message: 'Click aumentado correctamente'});
       });
     } else {
