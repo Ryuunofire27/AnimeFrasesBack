@@ -1,25 +1,25 @@
 const schema = require('../schemas/personaje-schema');
 
 class CharacterModel {
-  getAll(cb, limit, page, pop, wh) {
+  getAll(cb, search, limit, page, pop, wh) {
     const limite = limit ? limit : 10;
     const pagina = page ? page : 1;
     const skip = limite * (pagina - 1);
     const order = pop ? { clicks : pop } : undefined;
     const whe = wh ? wh : '';
     schema.count({}, (err, count) => {
-      if (err) throw err;
+      if (err) cb(err);
       if (count > 0) {
-        schema.find()
+        schema.find(search)
           //.select('_id id name description anime sex imgRelUrl clicks')
           .where(whe)
           .sort(order)
           .skip(skip)
           .limit(limite)
           .exec((err1, docs) => {
-            if (err1) throw err1;
+            if (err1) cb(err1);
             const pages = Math.ceil(count / limite);
-            cb({ count, docs, pages });
+            cb(null, { count, docs, pages });
           });
       } else {
         cb({ msg: 'Not found' });
@@ -86,15 +86,15 @@ class CharacterModel {
     });
   }
 
-  saveCharacter(data, cb, cbErr) {
+  saveCharacter(data, cb) {
     schema.count({ name: data.name }, (err, count) => {
-      if (err) cbErr(err);
+      if (err) cb(err);
       if (count === 0) {
         schema.create(data)
-          .then(docs => cb('Insert/Update succesful', docs))
-          .catch(err1 => cbErr('Error, insert unsuccesful', err1));
+          .then(docs => cb(null, { message: 'Insert/Update succesful' }))
+          .catch(err1 => cb({ message: 'Error, insert unsuccesful' }));
       } else {
-        cbErr('Error, the name character exist');
+        cb({ message: 'Error, the name character exist' });
       }
     });
   }

@@ -15,42 +15,45 @@ class CharacterController {
     const page = req.query.page;
     const pop = req.query.pop;
     const notVoid = req.query.void;
+    const objectSearch = {};
     let wh = null;
-    if(pop){
+    if (pop) {
       if(!(pop === 'asc' || pop === 'desc')) return res.status(400).send({ message: 'pop is not a defined statement'})
     }
-    if(notVoid == 1){
-      wh = {phrases: {$gt: []}};
+    if (notVoid == 1) {
+      wh = { phrases: { $gt: [] } };
     }
-    if(search || anime || sex){
-      const objectSearch = {};
-      if (search) {
-        objectSearch.name = { '$regex': search.toUpperCase() }
-      }
-      if (anime) {
-        objectSearch.anime = anime.toUpperCase();
-      }
-      if (sex) {
-        objectSearch.sex = sex.toUpperCase();
-      }
-      cm.getSearch(objectSearch, docs => res.send(docs), parseInt(limit), parseInt(page), pop, wh);
-    } else {
-      cm.getAll( docs => res.send(docs), parseInt(limit), parseInt(page), pop, wh);
+    if (search) {
+      objectSearch.name = { '$regex': search.toUpperCase() }
     }
+    if (anime) {
+      objectSearch.anime = anime.toUpperCase();
+    }
+    if (sex) {
+      objectSearch.sex = sex.toUpperCase();
+    }
+    cm.getAll( (err, docs) => {
+      if (err) return res.send(404).send(err);
+      return res.status(200).send(docs);
+    },
+     objectSearch, parseInt(limit), parseInt(page), pop, wh);
   }
 
 	getById(req, res) {
     const id = req.params.id;
     cm.getById(id, (docs) => {
-      docs ? res.send(docs) : res.status(404).send({ message: 'Don\'t exist document' });
+      docs ? res.status(200).send(docs) : res.status(404).send({ message: 'Don\'t exist document' });
     });
-    cm.addingClick(id);
+    cm.addingClick(id, (err) => {
+      if (err) return res.send(500).send(err);
+      return res.send(200).send({ message: 'Click aumentado correctamente'});
+    });
   }
   
   getPhrasesByCharacter(req, res) {
     const id = req.params.id;
     cm.getPhrasesByCharacter(id, (docs) => {
-      docs ? res.send(docs) : res.status(404).send({ message: 'Don\'t exist document' });
+      docs ? res.status(200).send(docs) : res.status(404).send({ message: 'Don\'t exist document' });
     });
   }
 
@@ -60,7 +63,10 @@ class CharacterController {
     cm.getPhraseById(idCharacter, idPhrase, (docs) => {
       docs ? res.send(docs) : res.status(404).send({ message: 'Don\'t exist document' });
     });
-    cm.addingClick(idCharacter);
+    cm.addingClick(idCharacter, (err) => {
+      if (err) return res.send(500).send(err);
+      return res.send(200).send({ message: 'Click aumentado correctamente'});
+    });
   }
 
   getPhraseAudio(req, res) {
@@ -69,7 +75,10 @@ class CharacterController {
     cm.getPhraseById(idCharacter, idPhrase, (audio) => {
       audio ? res.write(audio) : res.status(404).send({ message: 'Don\'t exist document' });
     }); 
-    cm.addingClick(idCharacter);
+    cm.addingClick(idCharacter, (err) => {
+      if (err) return res.send(500).send(err);
+      return res.send(200).send({ message: 'Click aumentado correctamente'});
+    });
   }
 
 	save(req, res) {
@@ -111,12 +120,15 @@ class CharacterController {
                 contrastColor: color.contrast,
                 phrases: phrases,
               };
-              cm.saveCharacter(character, (msg) => res.send({ msg }), (msg) => {
-                  util.deleteFile(`${directory}/${character.imgRelUrl}`);
-                  character.phrases.map((phrase) => {
-                    util.deleteFile(`${directory}/${phrase.audioRelUrl}`);
-                  });
-                  res.send({ msg })
+              cm.saveCharacter(character, (err, msg) => {
+                  if (err) {
+                    util.deleteFile(`${directory}/${character.imgRelUrl}`);
+                    character.phrases.map((phrase) => {
+                      util.deleteFile(`${directory}/${phrase.audioRelUrl}`);
+                    });
+                    return res.status(500).send(err);
+                  }
+                  res.send(msg);
                 });
               });
           } else {

@@ -13,7 +13,7 @@ router
   .post('/:id/phrases', authentication, cc.addPhrases)
   .put('/:id', authentication, cc.update)
   .put('/:idCharacter/phrases/:idPhrase', authentication, cc.updatePhrase)
-  .put('/:idCharacter/click')
+  .put('/:idCharacter/click', cc.addingClick)
   .delete('/:id', authentication, cc.delete)
   .delete('/:id/phrases/:idPhrase', authentication, cc.deletePhrase);
 
