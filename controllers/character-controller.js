@@ -44,10 +44,6 @@ class CharacterController {
     cm.getById(id, (docs) => {
       docs ? res.status(200).send(docs) : res.status(404).send({ message: 'Don\'t exist document' });
     });
-    cm.addingClick(id, (err) => {
-      if (err) return res.status(500).send(err);
-      return res.status(200).send({ message: 'Click aumentado correctamente'});
-    });
   }
   
   getPhrasesByCharacter(req, res) {
@@ -63,10 +59,6 @@ class CharacterController {
     cm.getPhraseById(idCharacter, idPhrase, (docs) => {
       docs ? res.send(docs) : res.status(404).send({ message: 'Don\'t exist document' });
     });
-    cm.addingClick(idCharacter, (err) => {
-      if (err) return res.status(500).send(err);
-      return res.status(200).send({ message: 'Click aumentado correctamente'});
-    });
   }
 
   getPhraseAudio(req, res) {
@@ -74,10 +66,6 @@ class CharacterController {
     const idPhrase = req.params.idPhrase;
     cm.getPhraseById(idCharacter, idPhrase, (audio) => {
       audio ? res.write(audio) : res.status(404).send({ message: 'Don\'t exist document' });
-    }); 
-    cm.addingClick(idCharacter, (err) => {
-      if (err) return res.status(500).send(err);
-      return res.status(200).send({ message: 'Click aumentado correctamente'});
     });
   }
 
