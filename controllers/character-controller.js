@@ -14,7 +14,7 @@ class CharacterController {
     const page = req.query.page;
     const pop = req.query.pop;
     const notVoid = req.query.void;
-    const objectSearch = {};
+    let objectSearch = {};
     let wh = null;
     if (pop) {
       if(!(pop === 'asc' || pop === 'desc' || pop === 'abc')) return res.status(400).send({ message: 'pop is not a defined statement'})
@@ -23,16 +23,16 @@ class CharacterController {
       wh = { phrases: { $gt: [] } };
     }
     if (search) {
-      objectSearch.search = { '$regex': search.toUpperCase() };
+      objectSearch = {'$or': [{ name: {'$regex': search.toUpperCase()} }, {anime: {'$regex': search.toUpperCase}}]};
     }
     if (sex) {
       objectSearch.sex = sex.toUpperCase();
     }
     cm.getAll( (err, docs) => {
-      if (err) return res.status(404).send(err);
-      return res.status(200).send(docs);
+      if (err) return res.send(err);
+      return res.send(docs);
     },
-     objectSearch, parseInt(limit), parseInt(page), pop, wh);
+    objectSearch, parseInt(limit), parseInt(page), pop, wh);
   }
 
 	getById(req, res) {
@@ -104,7 +104,7 @@ class CharacterController {
                 contrastColor: color.contrast,
                 phrases: phrases,
               };
-              cm.saveCharacter(character, (err, msg) => {
+              cm.saveCharacter(character, (err, message) => {
                   if (err) {
                     util.deleteFile(`${directory}/${character.imgRelUrl}`);
                     character.phrases.map((phrase) => {
@@ -112,7 +112,7 @@ class CharacterController {
                     });
                     return res.status(500).send(err);
                   }
-                  res.send(msg);
+                  res.send(message);
                 });
               });
           } else {
@@ -153,11 +153,15 @@ class CharacterController {
               character.popularColor = color.normal;
               character.contrastColor = color.contrast;
               character.imgRelUrl = imgPath.split(`${directory}/`)[1];
-              cm.getById(_id, (doc) => {
+              cm.getById(_id, (err, doc) => {
+                if(err) return res.status(500).send(err);
                 character.clicks = doc.clicks;
                 character.phrases = doc.phrases;
                 util.deleteFile(`${directory}/${doc.imgRelUrl}`);
-                cm.updateCharacter(character, msg => res.send({ msg }));
+                cm.updateCharacter(character, (err, message) => {
+                  if(err) return res.status(500).send({ err });
+                  res.send({ message });
+                });
               });
             });
           });
@@ -240,7 +244,8 @@ class CharacterController {
 	delete(req, res) {
     const id = req.params.id;
     if (id) {
-      cm.delete(id, (doc, msg) => {
+      cm.delete(id, (err, doc, msg) => {
+        if(err) return res.status(500).send(err);
         util.deleteFile(`${directory}/${doc.imgRelUrl}`);
         doc.phrases.map((phrase) => {
           util.deleteFile(`${directory}/${phrase.audioRelUrl}`);
@@ -256,7 +261,8 @@ class CharacterController {
     const id = req.params.id;
     const idPhrase = req.params.idPhrase;
     if(id && idPhrase) {
-      cm.deletePhrase(id, idPhrase, (msg, audioPath) => {
+      cm.deletePhrase(id, idPhrase, (err, msg, audioPath) => {
+        if(err) return res.status(500).send(err);
         if (audioPath) util.deleteFile(`${directory}/${audioPath}`);
         res.send({ message: msg })
       });
