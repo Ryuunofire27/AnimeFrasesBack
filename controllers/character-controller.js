@@ -10,7 +10,6 @@ class CharacterController {
   getAll(req, res) {
     const search = req.query.search;
     const sex = req.query.sex;
-    const anime = req.query.anime;
     const limit = req.query.limit;
     const page = req.query.page;
     const pop = req.query.pop;
@@ -18,22 +17,19 @@ class CharacterController {
     const objectSearch = {};
     let wh = null;
     if (pop) {
-      if(!(pop === 'asc' || pop === 'desc')) return res.status(400).send({ message: 'pop is not a defined statement'})
+      if(!(pop === 'asc' || pop === 'desc' || pop === 'abc')) return res.status(400).send({ message: 'pop is not a defined statement'})
     }
     if (notVoid == 1) {
       wh = { phrases: { $gt: [] } };
     }
     if (search) {
-      objectSearch.name = { '$regex': search.toUpperCase() }
-    }
-    if (anime) {
-      objectSearch.anime = anime.toUpperCase();
+      objectSearch.search = { '$regex': search.toUpperCase() };
     }
     if (sex) {
       objectSearch.sex = sex.toUpperCase();
     }
     cm.getAll( (err, docs) => {
-      if (err) return res.send(404).send(err);
+      if (err) return res.status(404).send(err);
       return res.status(200).send(docs);
     },
      objectSearch, parseInt(limit), parseInt(page), pop, wh);

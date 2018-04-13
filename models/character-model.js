@@ -5,13 +5,15 @@ class CharacterModel {
     const limite = limit ? limit : 10;
     const pagina = page ? page : 1;
     const skip = limite * (pagina - 1);
-    const order = pop ? { clicks : pop } : undefined;
+    const order = pop ? (pop === 'abc' ? {name: 'asc'} : { clicks : pop }) : undefined;
     const whe = wh ? wh : '';
+    const find = search.sex ? {sex: search.sex} : {}; 
+    console.log(order);
     schema.count({}, (err, count) => {
       if (err) cb(err);
       if (count > 0) {
-        schema.find(search)
-          //.select('_id id name description anime sex imgRelUrl clicks')
+        schema.find(find)
+          .or([{name: search.search}, {anime: search.search}])
           .where(whe)
           .sort(order)
           .skip(skip)
