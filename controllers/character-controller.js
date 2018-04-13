@@ -23,7 +23,7 @@ class CharacterController {
       wh = { phrases: { $gt: [] } };
     }
     if (search) {
-      objectSearch = {'$or': [{ name: {'$regex': search.toUpperCase()} }, {anime: {'$regex': search.toUpperCase}}]};
+      objectSearch = {'$or': [{ 'name': {'$regex': search.toUpperCase()} }, {'anime': {'$regex': search.toUpperCase()}}]};
     }
     if (sex) {
       objectSearch.sex = sex.toUpperCase();
