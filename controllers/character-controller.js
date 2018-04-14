@@ -37,31 +37,23 @@ class CharacterController {
 
 	getById(req, res) {
     const id = req.params.id;
-    cm.getById(id, (docs) => {
-      docs ? res.status(200).send(docs) : res.status(404).send({ message: 'Don\'t exist document' });
+    cm.getById(id, (err, doc) => {
+      !err ? res.status(200).send(docs) : res.status(404).send({ message: 'Don\'t exist document' });
     });
   }
   
   getPhrasesByCharacter(req, res) {
     const id = req.params.id;
-    cm.getPhrasesByCharacter(id, (docs) => {
-      docs ? res.status(200).send(docs) : res.status(404).send({ message: 'Don\'t exist document' });
+    cm.getPhrasesByCharacter(id, (err, docs) => {
+      !err ? res.status(200).send(docs) : res.status(404).send({ message: 'Don\'t exist document' });
     });
   }
 
   getPhraseById(req, res) {
     const idCharacter = req.params.idCharacter;
     const idPhrase = req.params.idPhrase;
-    cm.getPhraseById(idCharacter, idPhrase, (docs) => {
-      docs ? res.send(docs) : res.status(404).send({ message: 'Don\'t exist document' });
-    });
-  }
-
-  getPhraseAudio(req, res) {
-    const idCharacter = req.params.idCharacter;
-    const idPhrase = req.params.idPhrase;
-    cm.getPhraseById(idCharacter, idPhrase, (audio) => {
-      audio ? res.write(audio) : res.status(404).send({ message: 'Don\'t exist document' });
+    cm.getPhraseById(idCharacter, idPhrase, (err, docs) => {
+      !err ? res.send(docs) : res.status(404).send({ message: 'Don\'t exist document' });
     });
   }
 
