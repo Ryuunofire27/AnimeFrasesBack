@@ -14,11 +14,11 @@ class FilesController{
           const readable = fs.createReadStream(path); 
           readable.pipe(res)
         } else { 
-          res.status(500).send({ msg: 'File not found' });
+          res.status(404).send({ msg: 'File not found' });
         }
       });
     } else {
-      res.status(500).send({ msg: 'File not found' });
+      res.status(400).send({ msg: 'Falta completar campos' });
     }
   }
 }
