@@ -1,6 +1,6 @@
 # AnimeFrasesBack
 
-## Routes
+## REST Routes
 
 ### GET METHODS
 ```
@@ -47,4 +47,19 @@
   delete character                  =>      characters/
   delete phrase by character        =>      characters/idCharacter/phrases/idPhrase
   delete user                       =>      users/idUser
+```
+
+## Socket Events
+
+### Emit Events
+
+```
+  get connections => pide informacion sobre las conexiones (un arreglo de conexiones las cuales tienen los atributos _id, date, connections)
+```
+
+### On Events
+
+```
+  get connections => recibe las conexiones (un arreglo de conexiones las cuales tienen los atributos _id, date, connections)
+  connections => recibe las nuevas conexiones que se realizan (un objeto conexiones el cual tiene los atributos _id, date, connections);
 ```

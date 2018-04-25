@@ -1,6 +1,6 @@
 {
   "name": "anime-frases",
-  "version": "1.6.4",
+  "version": "1.7.0",
   "description": "backend de la web sobre frases de animes",
   "main": "index.js",
   "scripts": {
@@ -21,7 +21,8 @@
     "jsonwebtoken": "^8.2.0",
     "mongoose": "^5.0.11",
     "mongoose-auto-increment": "^5.0.1",
-    "node-vibrant": "^3.0.0"
+    "node-vibrant": "^3.0.0",
+    "socket.io": "^2.1.0"
   },
   "devDependencies": {
     "eslint": "^4.19.0",
