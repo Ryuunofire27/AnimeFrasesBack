@@ -37,31 +37,23 @@ class CharacterController {
 
 	getById(req, res) {
     const id = req.params.id;
-    cm.getById(id, (docs) => {
-      docs ? res.status(200).send(docs) : res.status(404).send({ message: 'Don\'t exist document' });
+    cm.getById(id, (err, doc) => {
+      !err ? res.status(200).send(doc) : res.status(404).send({ message: 'Don\'t exist document' });
     });
   }
   
   getPhrasesByCharacter(req, res) {
     const id = req.params.id;
-    cm.getPhrasesByCharacter(id, (docs) => {
-      docs ? res.status(200).send(docs) : res.status(404).send({ message: 'Don\'t exist document' });
+    cm.getPhrasesByCharacter(id, (err, docs) => {
+      !err ? res.status(200).send(docs) : res.status(404).send({ message: 'Don\'t exist document' });
     });
   }
 
   getPhraseById(req, res) {
     const idCharacter = req.params.idCharacter;
     const idPhrase = req.params.idPhrase;
-    cm.getPhraseById(idCharacter, idPhrase, (docs) => {
-      docs ? res.send(docs) : res.status(404).send({ message: 'Don\'t exist document' });
-    });
-  }
-
-  getPhraseAudio(req, res) {
-    const idCharacter = req.params.idCharacter;
-    const idPhrase = req.params.idPhrase;
-    cm.getPhraseById(idCharacter, idPhrase, (audio) => {
-      audio ? res.write(audio) : res.status(404).send({ message: 'Don\'t exist document' });
+    cm.getPhraseById(idCharacter, idPhrase, (err, docs) => {
+      !err ? res.send(docs) : res.status(404).send({ message: 'Don\'t exist document' });
     });
   }
 
@@ -167,13 +159,17 @@ class CharacterController {
           });
         });
       } else {
-        cm.getById(_id, (doc) => {
+        cm.getById(_id, (err, doc) => {
+          if (err) return res.send(err);
           character.clicks = doc.clicks;
           character.phrases = doc.phrases;
           character.popularColor = doc.popularColor;
           character.contrastColor = doc.contrastColor;
           character.imgRelUrl = doc.imgRelUrl;
-          cm.updateCharacter(character, msg => res.send({ msg }));
+          cm.updateCharacter(character, (err, msg) => {
+            if (err) return res.send(err);
+            res.send({ msg })
+          });
         });
       }
     } else {
@@ -191,13 +187,17 @@ class CharacterController {
       const filesValues = Object.values(req.files);
       const phrasesArr = util.getArrPhrasesPart(bodyKeys, bodyValues, 'phrase');
       const audiosArr = util.getArrPhrasesPart(filesKeys, filesValues, 'audio');
-      cm.getById(_id, (docs) => {
+      cm.getById(_id, (err, docs) => {
+        if (err) return res.send(err);
         if (docs) {
           const animeDirectory = docs.anime.toUpperCase().replace(/ /g, '-');
           util.addPhrases(docs.phrases, phrasesArr, audiosArr, animeDirectory);
-          cm.updateCharacter(docs, msg => res.send({ msg }));
+          cm.updateCharacter(docs, (err, message) => {
+            if (err) return res.send(err);
+            res.send({ message });
+          });
         } else {
-          res.status(204).send({ msg: 'Character not found' });
+          res.status(404).send({ msg: 'Character not found' });
         }
       });
     } else {
@@ -212,7 +212,8 @@ class CharacterController {
       const phrase = req.body.phrase;
       const files = req.files;
       if (phrase || files) {
-        cm.getById(idCharacter, (doc) => {
+        cm.getById(idCharacter, (err, doc) => {
+          if (err) return res.send(err);
           const animeDirectory = doc.anime.toUpperCase().replace(/ /g, '-');
           doc.phrases = doc.phrases.map((p) => {
             if (p._id == idPhrase) {
@@ -231,7 +232,10 @@ class CharacterController {
             }
             return p;
           });
-          cm.updateCharacter(doc, msg => res.send({ msg }));
+          cm.updateCharacter(doc, (err, message) => {
+            if (err) return res.send(err); 
+            res.send({ message })
+          });
         });
       } else {
         res.status(400).send({ msg: 'falta llenar campos'});

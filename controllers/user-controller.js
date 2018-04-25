@@ -8,13 +8,17 @@ const um = new UserModel();
 
 class UserController {
   getAll(req, res) {
-    um.getAll(docs => res.send(docs));
+    um.getAll((err, docs) => {
+      if(err) return res.status(500).send(err);
+      res.send(docs);
+    });
   }
 
   getById(req, res) {
     const id = req.params.id;
-    um.getById(id, (docs) => {
-      docs ? res.send(docs) : res.send({ message: 'Don\'t exist document' });
+    um.getById(id, (err, doc) => {
+      if (err) return res.status(500).send(err);
+      doc ? res.send(doc) : res.send({ message: 'Don\'t exist document' });
     });
   }
 
@@ -29,7 +33,10 @@ class UserController {
         user,
         password: hmac.digest('hex'),
       };
-      um.save(usuario, msg => res.send({ msg }));
+      um.save(usuario, (err, msg) => {
+        if (err) return res.status(500).send(err);
+        res.send({ msg });
+      });
     } else {
       res.status(400).send({ msg: 'falta llenar campos' });
     }
@@ -37,7 +44,15 @@ class UserController {
 
 	delete(req, res) {
     const id = req.params.id;
-		id ? um.delete(id, msg => res.send({ message: msg })) : res.status(400).send({ msg: 'Falta el id' });
+
+		if (id){
+      um.delete(id, (err) => {
+        if (err) return res.status(500).send(err);
+        res.send({ msg: 'Delete succesful' });
+      });
+    } else {
+      res.status(400).send({ msg: 'Falta el id' });
+    };
   }
 
   deletePhrase(req, res) {
@@ -56,13 +71,13 @@ class UserController {
         user,
         password: hmac.digest('hex'),
       };
-      um.login(usuario, (msg, doc) => {
+      um.login(usuario, (err, msg, doc) => {
+        if (err) return res.status(500).send(err);
+        if (msg) return res.status(401).send(msg);
         if (doc) {
           const token = jwt.sign({ user: doc }, seed, { expiresIn: 3600 });
           res.send({ user: doc, token });
-        } else {
-          res.send({ msg });
-        }
+        } 
       });
     } else {
       res.status(400).send({ msg: 'Falta llenar campos' });

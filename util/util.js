@@ -4,7 +4,6 @@ const directory = require('../config/directory').directory;
 class Util {
   static format(name) {
     const date = new Date();
-    console.log(`${date.getTime()}_${name}`);
     return `${date.getTime()}_${name}`;
   }
   
@@ -25,7 +24,7 @@ class Util {
     fs.stat(filePath, (err) => {
       if (!err) {
         fs.unlink(filePath, (err1) => {
-          if (!err1) console.log('eliminado con exito');
+          if (err1) throw err1; 
         });
       }
     });

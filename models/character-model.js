@@ -35,18 +35,18 @@ class CharacterModel {
 
   getPhrasesByCharacter(id, cb) {
     schema.findById(id, '_id phrases imgRelUrl', (err, docs) => {
-      if (err) throw err;
-      cb(docs);
+      if (err) cb(err);
+      cb(null, docs);
     });
   }
 
   getPhraseById(idCharacter, idPhrase, cb) {
     schema.findOne({ _id: idCharacter }, '_id phrases imgRelUrl', (err, docs) => {
-      if (err) throw err;
+      if (err) cb(err);
       const phrase = docs.phrases.filter((val) => {
         if (val._id == idPhrase) return val;
       });
-      cb(phrase);
+      cb(null, phrase);
     });
   }
 
